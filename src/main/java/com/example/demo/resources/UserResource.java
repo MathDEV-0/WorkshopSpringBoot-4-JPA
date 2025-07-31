@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +15,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.demo.entities.User;
+import com.example.demo.services.ProductService;
 import com.example.demo.services.UserService;
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserResource {
+
+    private final ProductService productService;
 	
 	@Autowired
 	private UserService userService;
+
+    UserResource(ProductService productService) {
+        this.productService = productService;
+    }
 	
 	@GetMapping
 	public ResponseEntity<List<User>> findAll(){
@@ -43,5 +51,11 @@ public class UserResource {
 				.buildAndExpand(obj.getId()).toUri();
 		
 		return ResponseEntity.created(uri).body(obj);
+	}
+	
+	@DeleteMapping(value = "/{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		userService.delete(id);
+		return ResponseEntity.noContent().build();
 	}
 }
